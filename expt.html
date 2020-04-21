@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="js/jspsych.js"></script>
+    <script src="js/jspsych-serial-reaction-time-mouse.js"></script>
+    <link rel="stylesheet" href="css/jspsych.css"></link>
+  </head>
+  <body></body>
+  <script>
+
+  // see https://www.jspsych.org/plugins/jspsych-serial-reaction-time-mouse/
+
+  red = "#F00";
+  green = "#0F0";
+
+  response_grid = [[1,0,0,0,1], 
+                   [0,0,0,0,0], // empty row
+                   [0,0,0,0,0], 
+                   [0,0,0,0,0], 
+                   [1,0,0,0,1]];
+
+  // targets[0] = upper left, targets[1] = upper right,
+  // targets[2] = lower left, targets[3] = lower right
+
+  target_template = {
+    type: 'serial-reaction-time-mouse',
+    grid: response_grid,
+    grid_square_size: 80,
+    allow_nontarget_responses: true,
+    target: null, // set this for each unique target
+    target_color: green,
+    pre_target_duration: 500 // .5s to start moving before target changes color
+  }
+
+  targets = []
+  targets[0] = JSON.parse(JSON.stringify(target_template));
+  targets[0].target = [0,0];
+
+  targets[1] = JSON.parse(JSON.stringify(target_template));;
+  targets[1].target = [0,4];
+
+  targets[2] = JSON.parse(JSON.stringify(target_template));;
+  targets[2].target = [4,0];
+
+  targets[3] = JSON.parse(JSON.stringify(target_template));;
+  targets[3].target = [4,4];
+
+// define the 'word' subsequences (based on first two lines of TestSeq1.txt)
+  words = []; 
+  words[0] = [2,3,4,1];
+  words[1] = [2,4,2,3];
+  words[2] = [4,1,2,4];
+  words[3] = [3,4,1,2];
+  words[4] = [1,2,4,2];
+  words[5] = [3,4,2,4];
+
+// define the sequence of 'words' we want the user to do (maybe per block?)
+  word_seq = [0,1,2, 3,4,5]; 
+
+  // test: do each target location once, clockwise from top left:
+  //trials = [targets[0], targets[1], targets[2], targets[3]];
+
+  trials = [];
+  for(var w = 0; w < word_seq.length; w++) {
+    cur_word = words[word_seq[w]];
+    console.log(cur_word);
+    for(var i = 0; i < cur_word.length; i++) {
+      trials.push( targets[cur_word[i]-1]  );
+    }
+  }
+
+instructionText = "Quickly and accurately move your mouse to any square that turns green. Press SPACE to continue."
+restText = "Rest your eyes for a moment. Press SPACE to continue when you're ready. Thanks!";
+doneText = "Please go to the experimenter and let them know that you are finished. If you have any questions, please do not hesitate to ask the experimenter.";
+
+// ToDo: store data
+// 'subject trial cond totalTime trialTime prevTarget curTarget nextTarget hitTargetPos timeTargetHit objTouched Correct xPos yPos') 
+
+
+  jsPsych.init({
+    timeline: trials,
+    on_finish: function(){jsPsych.data.displayData();}
+  });
+
+
+  </script>
+</html>
+
