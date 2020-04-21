@@ -3,6 +3,7 @@
   <head>
     <script src="js/jspsych.js"></script>
     <script src="js/jspsych-serial-reaction-time-mouse.js"></script>
+    <script src="js/jspsych-instructions.js"></script>
     <link rel="stylesheet" href="css/jspsych.css"></link>
   </head>
   <body></body>
@@ -57,10 +58,35 @@
 // define the sequence of 'words' we want the user to do (maybe per block?)
   word_seq = [0,1,2, 3,4,5]; 
 
+
+var instrTrial = {
+    type: 'instructions',
+    pages: [
+        'Welcome! You will be using your mouse to move around and click on buttons. Click next for more instructions.',
+        'Please quickly and accurately move your mouse to any square that turns green.',
+        'Please focus on the task, and take only short rest breaks as indicated. Click next to begin!.'
+    ],
+    show_clickable_nav: true
+}
+
+var restTrial = {
+    type: 'instructions',
+    pages: ["Please rest your eyes for a moment (but not more than a minute). Click next to continue when you're ready. Thank you!"],
+    show_clickable_nav: true
+}
+
+
+var doneTrial = {
+    type: 'instructions',
+    pages: ["You're all done -- thank you for your participation! This experiment investigates human sequence learning."],
+    show_clickable_nav: true
+}
+
   // test: do each target location once, clockwise from top left:
   //trials = [targets[0], targets[1], targets[2], targets[3]];
 
-  trials = [];
+// build list of targets based on word_seq
+  trials = [instrTrial];
   for(var w = 0; w < word_seq.length; w++) {
     cur_word = words[word_seq[w]];
     console.log(cur_word);
@@ -69,9 +95,7 @@
     }
   }
 
-instructionText = "Quickly and accurately move your mouse to any square that turns green. Press SPACE to continue."
-restText = "Rest your eyes for a moment. Press SPACE to continue when you're ready. Thanks!";
-doneText = "Please go to the experimenter and let them know that you are finished. If you have any questions, please do not hesitate to ask the experimenter.";
+trials.push(doneTrial);
 
 // ToDo: store data
 // 'subject trial cond totalTime trialTime prevTarget curTarget nextTarget hitTargetPos timeTargetHit objTouched Correct xPos yPos') 
