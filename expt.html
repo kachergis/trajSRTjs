@@ -4,12 +4,24 @@
     <script src="js/jspsych.js"></script>
     <script src="js/jspsych-serial-reaction-time-mouse.js"></script>
     <script src="js/jspsych-instructions.js"></script>
+	<script src="js/jspsych-survey-text.js"></script>
+	<script src="js/jspsych-survey-multi-choice.js"></script>
+	<script src="js/jspsych-survey-multi-select.js"></script>
+	<script src="js/jspsych-survey-likert.js"></script>
+	<script src="js/jspsych-survey-html-form.js"></script>
     <link rel="stylesheet" href="css/jspsych.css"></link>
 </head>
 <body>
 </body>
 <script>
-    // see https://www.jspsych.org/plugins/jspsych-serial-reaction-time-mouse/
+    // todo: assign participantID based on number of files in directory +1 and store it as subject field
+		// at this point also create the data file, and write to it after every block
+	participantID = 0 // placeholder ID
+	jsPsych.data.addProperties({
+		subject: participantID
+	});
+
+	// see https://www.jspsych.org/plugins/jspsych-serial-reaction-time-mouse/
     red = "#F00";
     green = "#0F0";
 
@@ -47,9 +59,9 @@
     targets[3] = JSON.parse(JSON.stringify(target_template));
     targets[3].target = [4,4];
 
-    // define the 'word' subsequences (original from previous experiments or turned by 90 degrees)
+    // define the 'word' subsequences (original from previous experiments or turned by 90 degrees), and store the orientation as experimental condition
     words = []; 
-    if(Math.random() > 0.5){
+    if(participantID % 2 === 0){
         orient = 'Original';
         words[0] = [2,3,1,2];
         words[1] = [3,1,2,1];
@@ -67,12 +79,18 @@
         words[4] = [2,3,4,1];
         words[5] = [3,4,1,2];
     }
+	jsPsych.data.addProperties({
+		condition: orient
+	});
 
-    // todo: assign a participantID
-
-	participantID = 1
 	// Define the sequence of 'words' we want this participant to do:
-		if(participantID === 1){
+		if(participantID === 0){
+			wordSeq1 = [1];
+			wordSeq2 = [2];
+			wordSeq3 = [3];
+			wordSeq4 = [4];
+		}
+		else if(participantID === 1){
 			wordSeq1 = [1,5,2,3,4,0,3,0,1,5,2,4,2,4,5,0,3,4,0,4,3,1,5,2,3,1,2,1,0,5,0,1,5,2,1,2,4,3,0,3,4,3,1,5,0,4,0,2,3,1,5,2,4,5,2,4,3,1,0,5];
 			wordSeq2 = [2,1,5,0,1,2,4,3,4,5,2,1,5,0,2,1,0,1,2,4,3,1,5,2,3,4,0,4,3,1,0,3,0,5,2,5,1,2,5,1,5,2,3,4,3,4,3,4,3,4,0,5,0,3,0,5,1,0,2,4];
 			wordSeq3 = [2,3,1,0,5,0,4,2,4,0,5,1,0,2,4,0,5,2,5,2,3,0,1,5,1,5,0,4,0,1,2,3,4,5,1,5,1,2,3,1,0,3,4,2,3,4,2,3,1,5,2,1,5,0,4,3,4,3,4,3];
@@ -565,25 +583,73 @@
 
     // function for pullin targets based off wordseqs, for each trial
 
-    function runMainTrial(sequenceNumber){
+    function createMainTrial(sequenceNumber){
 		wordSeq_Cur = seqList[sequenceNumber-1]
         for(var w = 0; w < wordSeq_Cur.length; w++){
             cur_word = words[wordSeq_Cur[w]];
-            console.log(cur_word);
             for(var i = 0; i < cur_word.length; i++){
                 trials.push( targets[cur_word[i]-1]);
             }
         }
     }
 
-    var instrTrialBegin = {
+	// defining other trials:
+
+	// see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input for html input element documentation
+    var informationLetter = {
+        type: 'survey-html-form',
+		preamble: '<p> Dear participant, <br/><br/> You are about to participate in an online experiment for which you will be awarded €3.50 or one course credit. The estimated duration is 30 minutes. <br/> The experiment consists of four positions on your computer screen which will change color sequentially. You will move the mouse cursor to each position as it changes color as quickly and accurately as possible. <br/> Your data will be processed without any uniquely identifying information, only for relevant research purposes, and you have the right to stop your participation at any time. In this case, you will be compensated for your invested time. <br/><br/> If you have any questions regarding privacy issues, please contact the Leiden University Data Protection officer at privacy@bb.leidenuniv.nl. <br/><br/> For any other questions you can contact Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl.<br/><br/><br/></p>',
+		html: '<p> <input name="consent" type="checkbox"/ required=true> I have read and understood the information above, and have had the opportunity to ask questions. I understand that the data will be collected and processed in a coded way. I understand that I can withdraw from participation at all times, without needing to provide reasons. I offer permission to participate and use of the data for the purposed described above.   <br/> <br/> <br/> Name: <input name="name" type="text" required=true/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: <input name="date" type="date" required=true /></p>'
+    }
+
+    var instrTrial1 = {
         type: 'instructions',
         pages: [
-            'Welcome! You will be using your mouse to move around and click on buttons. Click next for more instructions.',
-            'Please quickly and accurately move your mouse to any square that turns green.',
-            'Please focus on the task, and take only short rest breaks as indicated. Click next to begin!.'],
+            'Welcome! Before we get started, please answer some demographic questions. Click "next" to continue.'
+		],
         show_clickable_nav: true
     }
+
+	var surveyTrialAge = {
+        type: 'survey-html-form',
+		preamble: '<p>Please indicate your age.</p>',
+		html: '<p> I am <input name="age" type="number" required=true/> years old.</p>'
+	}
+
+	var surveyTrialGender = {
+        type: 'survey-multi-choice',
+        questions: [
+			{prompt: 'Please indicate your gender', name: 'gender', options: ['cis male', 'cis female', 'trans male', 'trans female', 'other',], required: true},
+		],
+	}
+
+	var instrTrial2 = {
+        type: 'instructions',
+        pages: [
+			'Thank you for answering our questions. Please read the following instructions carefully.',
+			'For this task, you will be using your mouse to move around and click on buttons.',
+			'Please quickly and accurately move your mouse to any square that turns green.',
+            'Please focus on the task, and take only short rest breaks as indicated.',
+			'Before you get started, you will briefly be asked some basic questions about the task to ensure the instructions were sufficiently clear. Click "next" to continue.'
+		],
+		show_clickable_nav: true
+	}
+
+	var surveyTrialTest = {
+        type: 'survey-multi-choice',
+        questions: [
+			{prompt: 'What have we asked you to do today?', name: 'instructions', options: ['Click green squares', 'Remember the colour of squares', 'Draw blue squares'], required: true},
+			{prompt: 'Data from your performance will...', name: 'data', options: ['not be collected.', 'be collected and stored securely and anonymously.', 'be collected and linked to your private information.'], required: true},
+		],
+	}
+
+	var instrTrial3 = {
+        type: 'instructions',
+        pages: [
+			'Thank you for answering our questions. The task will begin when you click "next". Please remember to focus on the task, and only take short rest breaks when instructed.'
+		],
+		show_clickable_nav: true
+	}
 
     var restTrial = {
         type: 'instructions',
@@ -591,59 +657,73 @@
         show_clickable_nav: true
     }
 
-    var instrTrialMid = {
-        type: 'instructions',
-        pages:[
-            'You will be done soon. In this phase, you will try to generate all of the action sequences that you learned in the previous phase.',
-            'You will be told when you finish a sequence correctly, after which you should generate a different one.',
-            'You will also be told when you make a mistake, in which case you should start the sequence anew. Keep trying until we stop the experiment.'],
-        show_clickable_nav: true
+ 	var surveyTrialProd = {
+        type: 'survey-text',
+        questions: [
+			{prompt: 'You are now almost done with the task. Please answer the following question: are there any sequences you remember occuring in the task? Please indicate using numbers, labeling the squares 1-4 top to bottom, left to right (i.e. bottom left = 3)'},
+		]
+	}
+
+	var doneTrial = {
+        type: 'survey-html-form',
+		button_label: 'Confirm & leave page.',
+        preamble: '<p> Dear participant, <br/> Thank you for participating. The goal of the study in which you participated was to investigate the speed of learning of movements and combinations of movements. Different participants performed different versions of the task, in which some versions were rotated. This helps us differentiate spatial (motor) effects from cognitive effects. <br/><br/> If you have any questions, feel free to contact the principal investigator Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl. <br/><br/><br/> If you would like to be informed about the results of this study, please indicate below. </p>',
+        html: '<p> Yes, please share the results of this research with me at the following address: <input name="email" type="email"/> [OPTIONAL]  </p>'
     }
 
-    var doneTrial = {
-        type: 'instructions',
-        pages: ["You're all done -- thank you for your participation! This experiment investigates human sequence learning."],
-        show_clickable_nav: true
-     }
+	// Loading all trials in order:
 
+    trials = [];
 
-    // to do: make production trial
-    function runTestTrial(){
-        }
+	trials.push(informationLetter);
 
+	trials.push(instrTrial1);
 
-    trials = [instrTrialBegin];
+	trials.push(surveyTrialAge);
 
-    runMainTrial(1);
+	trials.push(surveyTrialGender);
+
+	trials.push(instrTrial2);
+
+	trials.push(surveyTrialTest);
+
+	trials.push(instrTrial3);
+
+    createMainTrial(1);
  
     trials.push(restTrial);
 
-    runMainTrial(2);
+    createMainTrial(2);
 
     trials.push(restTrial);
 
-    runMainTrial(3);
+    createMainTrial(3);
 
     trials.push(restTrial);
 
-    runMainTrial(4);
+    createMainTrial(4);
 
-    trials.push(instrTrialMid);
+    trials.push(surveyTrialProd);
 
-    // trials.push(prodTrial);
+	trials.push(doneTrial);
 
-    trials.push(doneTrial);
-
-    // ToDo: store data + condition
+    // ToDo: store data
     // 'subject trial cond totalTime trialTime prevTarget curTarget nextTarget hitTargetPos timeTargetHit objTouched Correct xPos yPos') 
+	// function fetched from https://www.jspsych.org/overview/data/
+	function saveData(name, data){
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', 'write_data.php'); // 'write_data.php' is the path to the php file described above.
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(JSON.stringify({filename: name, filedata: data}));
+	}
 
     jsPsych.init({
         timeline: trials,
         on_finish: function(){
-            jsPsych.data.displayData('csv');
-            console.log(jsPsych.data.get().csv());
+			saveData('data_s' + participantID, jsPsych.data.get().csv());
+			console.log('Thank you for your time. You may now close your browser window and leave the page.');			
         }
     });
+
 </script>
 </html>
-
