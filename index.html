@@ -14,7 +14,7 @@
 </body>
 <script>
 	// Toggle debugging mode:
-	realTrials = false; 
+	realTrials = true; 
 	// fetch existing data
 	// queue & send request
 	var xhr = new XMLHttpRequest();		
@@ -680,8 +680,8 @@
 		// see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input for html input element documentation
 	    var informationLetter = {
 	        type: 'survey-html-form',
-			preamble: '<p> Dear participant, <br/><br/> You are about to participate in an online experiment for which you will be awarded €3.50 or one course credit. The estimated duration is 30 minutes. <br/> The experiment consists of four positions on your computer screen which will change color sequentially. You will move the mouse cursor to each position as it changes color as quickly and accurately as possible. <br/> Your data will be processed without any uniquely identifying information, only for relevant research purposes, and you have the right to stop your participation at any time. In this case, you will be compensated for your invested time. <br/><br/> If you have any questions regarding privacy issues, please contact the Leiden University Data Protection officer at privacy@bb.leidenuniv.nl. <br/><br/> For any other questions you can contact Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl.<br/><br/><br/></p>',
-			html: '<p> <input name="consent" type="checkbox"/ required=true> I have read and understood the information above, and have had the opportunity to ask questions. I understand that the data will be collected and processed in a coded way. I understand that I can withdraw from participation at all times, without needing to provide reasons. I offer permission to participate and use of the data for the purposed described above.   <br/> <br/> <br/> Name: <input name="name" type="text" required=true/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Today\'s Date: <input name="date" type="text" value= ' + today + ' required=true size=8 pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" /> (yyyy-mm-dd)</p>',
+			preamble: '<p> <div style="width:500px;" align="justify"> Dear participant, <br/><br/> You are about to participate in an online experiment for which you will be awarded €3.50 or one course credit. The estimated duration is 30 minutes. <br/> The experiment consists of four positions on your computer screen which will change color sequentially. You will move the mouse cursor to each position as it changes color as quickly and accurately as possible. <br/> Your data will be processed without any uniquely identifying information, only for relevant research purposes, and you have the right to stop your participation at any time. In this case, you will be compensated for your invested time. <br/><br/> If you have any questions regarding privacy issues, please contact the Leiden University Data Protection officer at privacy@bb.leidenuniv.nl. <br/><br/> For any other questions you can contact Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl.<br/><br/></div></p>',
+			html: '<p> <div style="width:500px;" align="left"> <input name="consent" type="checkbox"/ required=true> I have read and understood the information above, and have had the opportunity to ask questions. I understand that the data will be collected and processed in a coded way. I understand that I can withdraw from participation at all times, without needing to provide reasons. I offer permission to participate and use of the data for the purposed described above.  </div> <br/> <div align="justify">Name: <input name="name" type="text" required=true/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Today\'s Date: <input name="date" type="text" value= ' + today + ' required=true size=8 pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" /> (yyyy-mm-dd) </div> </p>',
 			on_finish: async function(){
 				// fetch data again:
 				var xhr2 = new XMLHttpRequest();		
@@ -718,14 +718,14 @@
 	    var instrTrial1 = {
 	        type: 'instructions',
 	        pages: [
-	            'Welcome! Before we get started, please answer some demographic questions. Click "next" to continue.'
+	            '<div style="width:500px;" >Welcome! Before we get started, please answer some demographic questions. Click "next" to continue. </div>'
 			],
 	        show_clickable_nav: true
 	    }
 
 		var surveyTrialAgeGender = {
 	        type: 'survey-html-form',
-			preamble: '<p>Please indicate your age and gender .</p>',
+			preamble: '<p><div style="width:500px;"> Please indicate your age and gender. </div> </p>',
 			html: '<p> I am <input name="age" type="number" required=true size=3 step = 1 autofocus=true min=10 max=99 /> years old. <br/> My gender is: <br/><input name="gender" type="radio" id="genderm" value="male" required=true /> <label for="male">Male</label><br/><input id="genderf" name="gender" type="radio" value="female" required=true/><label for="female">Female</label><br/><input id="gendero" name="gender" type="radio" value="other" required=true/>  <label for="other">Other</label></p>',
 			on_finish: function(){
 				saveData(jsPsych.data.get().csv());
@@ -735,11 +735,11 @@
 		var instrTrial2 = {
 	        type: 'instructions',
 	        pages: [
-				'Thank you for answering our questions. Please read the following instructions carefully.',
-				'For this task, you will be using your mouse to move around and click on buttons.',
-				'Please quickly and accurately move your mouse to any square that turns green and click it.',
-	            'Please focus on the task, and take only short rest breaks as indicated.',
-				'Before you get started, you will briefly be asked some basic questions about the task to ensure the instructions were sufficiently clear. Click "next" to continue.'
+				'<div style="width:500px;" > Thank you for answering our questions. Please read the following instructions carefully. </div>',
+				'<div style="width:500px;" > For this task, you will be using your mouse to move around and click on buttons. </div>',
+				'<div style="width:500px;" > Please quickly and accurately move your mouse to any square that turns green and click it. </div>',
+	            '<div style="width:500px;" > Please focus on the task, and take only short rest breaks as indicated. </div>',
+				'<div style="width:500px;"> Before you get started, you will briefly be asked some basic questions about the task to ensure the instructions were sufficiently clear. Click "next" to continue. </div>'
 			],
 			show_clickable_nav: true
 		}
@@ -747,22 +747,29 @@
 		var surveyTrialTest = {
 	        type: 'survey-multi-choice',
 	        questions: [
-				{prompt: 'What have we asked you to do today?', name: 'instructions', options: ['Click green squares', 'Remember the colour of squares', 'Draw blue squares'], required: true},
-				{prompt: 'Data from your performance will...', name: 'data', options: ['not be collected.', 'be collected and stored securely and anonymously.', 'be collected and linked to your private information.'], required: true},
+				{prompt: '<div align="left"> What have we asked you to do today? </div> ', name: 'instructions', options: ['Click green squares', 'Remember the colour of squares', 'Draw blue squares'], required: true},
+				{prompt: '<div aling= "left"> Data from your performance will... </div> ', name: 'data', options: ['not be collected.', 'be collected and stored securely and anonymously.', 'be collected and linked to your private information.'], required: true},
+			],
+		}
+
+		var surveyInputDevice = {
+			type: 'survey-multi-choice',
+			questions: [
+				{prompt: '<div style="width:500px;"> Thank you. You may use either a computer mouse or trackpad for the task. Please indicate which you will use. </div>', name: 'inputDevice', options: ['Mouse', 'Trackpad'], required: true}
 			],
 		}
 	
 		var instrTrial3 = {
 	        type: 'instructions',
 	        pages: [
-				'Thank you for answering our questions. The task will begin when you click "next". Please remember to focus on the task, and only take short rest breaks when instructed.'
+				'<div style="width:500px;"> Thank you for answering our questions. The task will begin when you click "next". Please remember to focus on the task, and only take short rest breaks when instructed. </div> '
 			],
 			show_clickable_nav: true
 		}
 
 		var restTrial = {
 			type: 'instructions',
-			pages: ["Please rest your eyes for a moment (but not more than a minute). Click next to continue when you're ready. Thank you!"],
+			pages: ["<div style='width:500px;'> Please rest your eyes for a moment (but not more than a minute). Click next to continue when you're ready. Thank you! </div> "],
 			show_clickable_nav: true,
 			on_start: function(){
 				saveData(jsPsych.data.get().csv());
@@ -772,7 +779,7 @@
  		var surveyTrialProd = {
 			type: 'survey-text',
 			questions: [
-				{prompt: 'You are now almost done with the task. Please answer the following question: are there any sequences you remember occuring in the task? Please indicate using numbers, labeling the squares 1-4 top to bottom, left to right (i.e. bottom left = 3)', placeholder:'e.g. 1-2-3-4, 1-2-1-2, ...'},
+				{prompt: '<div style="width:500px;"> You are now almost done with the task. Please answer the following question: are there any sequences you remember occuring in the task? Please indicate using numbers, labeling the squares 1-4 top to bottom, left to right (i.e. bottom left = 3).  </div> <br/><br/><img src="numbered_squares.png" width=25% >', placeholder:'e.g. 1-2-3-4, 1-2-1-2, ...'},
 			],
 			on_start: function(){
 				saveData(jsPsych.data.get().csv());
@@ -785,8 +792,8 @@
 		var doneTrial = {
 			type: 'survey-html-form',
 			button_label: 'Confirm & leave page.',
-			preamble: '<p> Dear participant, <br/> Thank you for participating. The goal of the study in which you participated was to investigate the speed of learning of movements and combinations of movements. Different participants performed different versions of the task, in which some versions were rotated. This helps us differentiate spatial (motor) effects from cognitive effects. <br/><br/> If you have any questions, feel free to contact the principal investigator Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl. <br/><br/><br/> If you would like to be informed about the results of this study, please indicate below. </p>',
-			html: '<p> Yes, please share the results of this research with me at the following address: <input name="email" type="email"/> [OPTIONAL]  </p>'
+			preamble: '<p> <div style="width:500px;" align="justify"> Dear participant, <br/> Thank you for participating. The goal of the study in which you participated was to investigate the speed of learning of movements and combinations of movements. Different participants performed different versions of the task, in which some versions were rotated. This helps us differentiate spatial (motor) effects from cognitive effects. <br/><br/> If you have any questions, feel free to contact the principal investigator Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl. <br/><br/><br/> If you would like to be informed about the results of this study, please indicate below. </div>  </p>',
+			html: '<p>  <div style="width:500px;" align="justify"> Yes, please share the results of this research with me at the following address: <input name="email" type="email"/> [OPTIONAL]  </div> </p>'
 		}
 
 		// Loading all trials in order:
@@ -801,6 +808,8 @@
 		trials.push(instrTrial2);
 	
 		trials.push(surveyTrialTest);
+
+		trials.push(surveyInputDevice);
 	
 		trials.push(instrTrial3);
 

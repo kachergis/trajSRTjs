@@ -116,7 +116,7 @@ jsPsych.plugins["serial-reaction-time-mouse"] = (function() {
         resp_targets = display_element.querySelectorAll('.jspsych-serial-reaction-time-stimulus-cell');
       }
       for(var i=0; i<resp_targets.length; i++){
-        resp_targets[i].addEventListener('mousedown', function(e){
+        resp_targets[i].addEventListener('mouseover', function(e){
           if(startTime == -1){
             return;
           } else {
