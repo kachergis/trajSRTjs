@@ -635,10 +635,7 @@
 		    target: null, // set this for each unique target
 		    target_color: green,
 		    pre_target_duration: 500, // .5s to start moving before target changes color
-			data: {
-				block: Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4)).toString(),  // get block number by dividing trials done by block length
-				subSequence: words[seqList[Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4))][Math.floor((jsPsych.data.get().filter({correct: true}).count()-wordSeq1.length*4*(Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4))))/4)]].toString() // get subsequence by index by getting number of moves this block (total mvoes minus moves per block times number of blocks) and dividing by number of moves per subsequence
-			}
+
 		}
 
 		targets = []

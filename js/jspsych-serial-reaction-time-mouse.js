@@ -156,7 +156,12 @@ jsPsych.plugins["serial-reaction-time-mouse"] = (function() {
 				"target": JSON.stringify(trial.target),
         "response_row": response.row,
         "response_column": response.column,
-        "correct": response.row == trial.target[0] && response.column == trial.target[1]
+        "correct": response.row == trial.target[0] && response.column == trial.target[1],
+        "blockNr": Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4)).toString(),  // get block number by dividing trials done by block length
+		"subSequenceNr": Math.floor((jsPsych.data.get().filter({correct: true}).count()-wordSeq1.length*4*(Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4))))/4).toString(), // get subsequence number by getting number of moves this block (total mvoes minus moves per block times number of blocks) and dividing by number of moves per subsequence
+        "moveNr": Math.floor((jsPsych.data.get().filter({correct: true}).count()-wordSeq1.length*4*(Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4))))).toString(), // get move nr by not dividing by 4
+        "subSequence": seqList[Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4))][Math.floor((jsPsych.data.get().filter({correct: true}).count()-wordSeq1.length*4*(Math.floor(jsPsych.data.get().filter({correct: true}).count()/(wordSeq1.length*4))))/4)].toString(), // get subsequence by index by getting number of moves this block (total mvoes minus moves per block times number of blocks) and dividing by number of moves per subsequence
+        "move": String(jsPsych.data.getLastTrialData().values()[0].target + "to" + JSON.stringify(trial.target))
       };
 
       // clear the display
