@@ -83,40 +83,40 @@
 		// Define the sequence of 'words' we want this participant to do:
 		if(realTrials === false){
 			if(participantID === 0 ){
-				wordSeq1 = [1, 0];
-				wordSeq2 = [2, 1];
-				wordSeq3 = [3, 2];
-				wordSeq4 = [4, 3];
+				wordSeq1 = [1];
+				wordSeq2 = [2];
+				wordSeq3 = [3];
+				wordSeq4 = [4];
 			}
 			else if(participantID === 1 ){
-				wordSeq1 = [2, 1];
-				wordSeq2 = [3, 2];
-				wordSeq3 = [4, 3];
-				wordSeq4 = [5, 4];
+				wordSeq1 = [2];
+				wordSeq2 = [3];
+				wordSeq3 = [4];
+				wordSeq4 = [5];
 			}
 			else if(participantID === 2 ){
-				wordSeq1 = [3, 2];
-				wordSeq2 = [4, 3];
-				wordSeq3 = [5, 4];
-				wordSeq4 = [0, 5];
+				wordSeq1 = [3];
+				wordSeq2 = [4];
+				wordSeq3 = [5];
+				wordSeq4 = [0];
 			} 
 			else if(participantID === 3 ){
-				wordSeq1 = [4, 3];
-				wordSeq2 = [5, 4];
-				wordSeq3 = [0, 5];
-				wordSeq4 = [1, 0];
+				wordSeq1 = [4];
+				wordSeq2 = [5];
+				wordSeq3 = [0];
+				wordSeq4 = [1];
 			}
 			else if(participantID === 4 ){
-				wordSeq1 = [5, 4];
-				wordSeq2 = [0, 5];
-				wordSeq3 = [1, 0];
-				wordSeq4 = [2, 1];
+				wordSeq1 = [5];
+				wordSeq2 = [0];
+				wordSeq3 = [1];
+				wordSeq4 = [2];
 			}
 			else if(participantID === 5 ){
-				wordSeq1 = [0, 5];
-				wordSeq2 = [1, 0];
-				wordSeq3 = [2, 1];
-				wordSeq4 = [3, 2];
+				wordSeq1 = [0];
+				wordSeq2 = [1];
+				wordSeq3 = [2];
+				wordSeq4 = [3];
 			} 
 			else{
 				alert('Sorry, we can\'t collect any more data at the moment.')
@@ -737,8 +737,8 @@
 	        type: 'instructions',
 	        pages: [
 				'<div style="width:500px;" > Thank you for answering our questions. Please read the following instructions carefully. </div>',
-				'<div style="width:500px;" > For this task, you will be using your mouse to move around and click on buttons. </div>',
-				'<div style="width:500px;" > Please quickly and accurately move your mouse to any square that turns green and click it. </div>',
+				'<div style="width:500px;" > For this task, you will be using your mouse to move around and hit buttons. </div>',
+				'<div style="width:500px;" > Please quickly and accurately move your mouse to any square that turns green. </div>',
 	            '<div style="width:500px;" > Please focus on the task, and take only short rest breaks as indicated. </div>',
 				'<div style="width:500px;"> Before you get started, you will briefly be asked some basic questions about the task to ensure the instructions were sufficiently clear. Click "next" to continue. </div>'
 			],
@@ -748,8 +748,8 @@
 		var instrTrial2b = {
 	        type: 'instructions',
 	        pages: [
-				'<div style="width:500px;" > For this task, you will be using your mouse to move around and click on buttons. </div>',
-				'<div style="width:500px;" > Please quickly and accurately move your mouse to any square that turns green and click it. </div>',
+				'<div style="width:500px;" > For this task, you will be using your mouse to move around and hit buttons. </div>',
+				'<div style="width:500px;" > Please quickly and accurately move your mouse to any square that turns green. </div>',
 	            '<div style="width:500px;" > Please focus on the task, and take only short rest breaks as indicated. </div>',
 				'<div style="width:500px;" > Click "next" to try the questions again. If you get stuck here, please contact the principal investigator Roy de Kleijn at kleijnrde@fsw.leidenuniv.nl </div>'
 			],
