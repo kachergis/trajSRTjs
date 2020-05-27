@@ -1,0 +1,164 @@
+---
+title: "Bayesian power analysis"
+author: "George"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+# Following: https://solomonkurz.netlify.com/post/bayesian-power-analysis-part-i/
+knitr::opts_chunk$set(echo = TRUE, verbose=F) # 
+library(tidyverse)
+library(brms)
+library(broom)
+```
+
+## Generate Data
+
+Participants will be 40-60 adults, assigned randomly to one of two conditions. 
+
+For our Bayesian power analysis, we will generate datasets corresponding to this design. We will estimate power to detect either a small effect size (Cohen's *d* = 0.2) or a moderate effect size (Cohen's *d* = 0.5).
+
+```{r generate_data}
+n = 50 # participants per condition (change this, clear knitr cache, and re-run)
+
+sim_d <- function(seed, n, effect_size) {
+  # define the means for standardized DVs
+  mu_t <- effect_size
+  mu_c <- 0
+  set.seed(seed)
+
+  d <- tibble(id = seq(1:(2*n)), 
+            group = rep(c("original", "rotated"), each = n)) %>% 
+      mutate(condition = ifelse(group == "original", 0, 1),
+          y = ifelse(group == "original", 
+                        rnorm(n, mean = mu_c, sd = 1),
+                        rnorm(n, mean = mu_t, sd = 1)))
+  return(d)
+}
+
+sm_d <- sim_d(123, n, .2) # assume a small effect size (Cohen's d)
+med_d <- sim_d(123, n, .5) # assume a medium effect size
+
+# get default brms prior
+get_prior(data = sm_d, family = gaussian,
+          y ~ 0 + Intercept + condition) # could add 
+
+```
+
+The independent variable is condition.
+Let's first run one Bayesian regression on one generated dataset for each effect size and see how they look.
+
+```{r regression-model, cache=T, results="hide"}
+fit_sm <- brm(data = sm_d,
+        family = gaussian,
+        y ~ 0 + Intercept + condition,
+        prior = c(prior(normal(0, 10), class = b),
+                  prior(student_t(3, 0, 10), class = sigma)),
+        seed = 123, silent=T)
+
+fit_med <- brm(data = med_d,
+        family = gaussian,
+        y ~ 0 + Intercept + condition,
+        prior = c(prior(normal(0, 10), class = b),
+                  prior(student_t(3, 0, 10), class = sigma)),
+        seed = 123, silent=T)
+```
+
+The regression on the small effect size generated data:
+
+```{r show-fit-sm}
+tidy(fit_sm, prob = .89) # use 89% credible intervals instead of 95%: https://easystats.github.io/bayestestR/articles/credible_interval.html
+```
+
+The regression on the medium effect size generated data:
+
+```{r sho-fit-med}
+tidy(fit_med, prob = .89)
+```
+
+
+```{r plot-small-effect-fit, caption="Plot of small effect size."}
+plot(fit_sm)
+```
+
+```{r plot-med-effect-fit, caption="Plot of medium effect size."}
+plot(fit_med)
+```
+
+
+## Run Simulations
+
+Now we'll simulate many more experiments (for each assumed effect size), and see in how many experiments we get a significant result in our Bayesian regression.
+
+```{r simulation, cache=T, warning=FALSE, message=FALSE, echo=FALSE, results="hide"}
+n_sim <- 100 # number of simulated experiments to run
+
+t1 <- Sys.time()
+
+s_sm <- tibble(seed = 1:n_sim) %>% 
+  mutate(d    = map(seed, sim_d, n = n, effect_size = .2)) %>% 
+  mutate(tidy = map2(d, seed, ~update(fit_sm, newdata = .x, seed = .y) %>% 
+                       tidy(prob = .89) %>% 
+                       filter(term == "b_condition")))
+
+
+s_med <- tibble(seed = 1:n_sim) %>% 
+  mutate(d    = map(seed, sim_d, n = n, effect_size = .5)) %>% 
+  mutate(tidy = map2(d, seed, ~update(fit_med, newdata = .x, seed = .y) %>% 
+                       tidy(prob = .89) %>% 
+                       filter(term == "b_condition")))
+
+t2 <- Sys.time()
+t2 - t1
+
+```
+
+
+```{r show-results-sm, out.width="90%", caption="Credible intervals in each of the 100 simulations of a small effect size."}
+
+s_sm %>% 
+  unnest(tidy) %>% 
+  ggplot(aes(x = reorder(seed, lower), y = estimate, ymin = lower, ymax = upper)) +
+  geom_pointrange(fatten = 1/2, alpha=.7) +
+  geom_hline(yintercept = c(0, .5), color = "white") +
+  labs(x = "seed (i.e., simulation index)",
+       y = expression(beta[condition]))
+```
+
+```{r show-results-med, out.width="90%", caption="Credible intervals in each of the 100 simulations of a medium effect size."}
+
+s_med %>% 
+  unnest(tidy) %>% 
+  ggplot(aes(x = reorder(seed, lower), y = estimate, ymin = lower, ymax = upper)) +
+  geom_pointrange(fatten = 1/2, alpha=.7) +
+  geom_hline(yintercept = c(0, .5), color = "white") +
+  labs(x = "seed (i.e., simulation index)",
+       y = expression(beta[condition]))
+```
+
+## Power
+
+```{r check_power}
+power_sm = s_sm %>% 
+  unnest(tidy) %>% 
+  mutate(check = ifelse(lower > 0, 1, 0)) %>% 
+  summarise(power = mean(check))
+
+powerpct_sm = unlist(power_sm*100)
+
+power_med = s_med %>% 
+  unnest(tidy) %>% 
+  mutate(check = ifelse(lower > 0, 1, 0)) %>% 
+  summarise(power = mean(check))
+
+powerpct_med = unlist(power_med*100)
+```
+
+In `r powerpct_sm`% of our `r n_sim` simulations of a small effect size (d=.2), a group size of `r n` per condition was sufficient to produce a [89% Bayesian credible interval](https://easystats.github.io/bayestestR/articles/credible_interval.html) that did not straddle 0.
+
+In `r powerpct_med`% of our `r n_sim` simulations of a medium effect size (d=.5), a group size of `r n` per condition was sufficient to produce a 89% Bayesian credible interval that did not straddle 0.
+
+(For n=20 per condition, only 12/100 small effect size experiments were successful, and only 40/100 medium effect size experiments were successful. Looks like we definitely want at least n=40 per condition.)
